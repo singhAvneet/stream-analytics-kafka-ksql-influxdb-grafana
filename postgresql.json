@@ -1,0 +1,580 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 6,
+  "links": [],
+  "panels": [
+    {
+      "circleMaxSize": "20",
+      "circleMinSize": "5",
+      "colors": [
+        "#C8F2C2",
+        "#96D98D",
+        "#56A64B",
+        "#37872D",
+        "rgba(50, 172, 45, 0.97)"
+      ],
+      "datasource": "PostgreSQL",
+      "decimals": 0,
+      "esMetric": "Count",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "hideEmpty": false,
+      "hideZero": false,
+      "id": 14,
+      "initialZoom": "1",
+      "locationData": "countries",
+      "mapCenter": "North America",
+      "mapCenterLatitude": 40,
+      "mapCenterLongitude": -100,
+      "maxDataPoints": 1,
+      "mouseWheelZoom": false,
+      "options": {},
+      "showLegend": false,
+      "stickyLabels": false,
+      "tableQueryOptions": {
+        "geohashField": "geohash",
+        "labelField": "",
+        "latitudeField": "",
+        "longitudeField": "",
+        "metricField": "value",
+        "queryType": "coordinates"
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select count(*) as value,c.\"GEOINTERNET\"  as metric,NOW() AS time from (\r\n\tselect  b.\"GEOINTERNET\",b.\"VALUE\",d.\"time\" as time,d.\"PARTYID\" from userlocation b left join \r\n(SELECT a.\"PARTYID\",MAX(a.\"TIMESTAMP\") as time from userlocation a  group by a.\"PARTYID\") d  \r\non b.\"TIMESTAMP\"= d.\"time\" where b.\"PARTYID\" = d.\"PARTYID\" and d.\"time\" >=  Now()::timestamp - INTERVAL '1 day' \r\n) c  group by c.\"GEOINTERNET\" ",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": "10,100,200,2000",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "User Location",
+      "type": "grafana-worldmap-panel",
+      "unitPlural": "",
+      "unitSingle": "",
+      "valueName": "total"
+    },
+    {
+      "datasource": "PostgreSQL",
+      "gridPos": {
+        "h": 9,
+        "w": 16,
+        "x": 8,
+        "y": 0
+      },
+      "hideTimeOverride": true,
+      "id": 4,
+      "options": {
+        "displayMode": "gradient",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "max": 20,
+            "min": 0,
+            "thresholds": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "override": {},
+          "values": false
+        },
+        "orientation": "vertical"
+      },
+      "pluginVersion": "6.3.5",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "  \r\n select count(*) as value, c.\"AREA\",  max(c.\"time\") as time from( \r\n  select b.\"AREA\",b.\"VALUE\",d.\"time\" as time,d.\"PARTYID\" from clickstream_active_sessions_mysql b  left join\r\n (select a.\"PARTYID\",MAX(a.\"TIMESTAMP\") as time from clickstream_active_sessions_mysql a group by a.\"PARTYID\") d\r\n  on b.\"TIMESTAMP\"= d.\"time\" where b.\"PARTYID\" = d.\"PARTYID\" and    $__timeFilter( time)\r\n ) c  group by c.\"AREA\" ",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "\"VALUE\""
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "\"AREA\""
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "clickstream_active_sessions_mysql",
+          "timeColumn": "\"TIMESTAMP\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": "6h",
+      "title": "User by application",
+      "type": "bargauge"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": true,
+      "colors": [
+        "#73BF69",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "PostgreSQL",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 9
+      },
+      "hideTimeOverride": true,
+      "id": 6,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "options": {},
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false,
+        "ymax": null,
+        "ymin": null
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select count(*) , now() as time\r\nfrom (SELECT MAX(b.\"TIMESTAMP\") as timestamp,b.\"PARTYID\" from clickstream_active_sessions_mysql b where $__timeFilter(b.\"TIMESTAMP\" )  group by b.\"PARTYID\") as c \r\n ",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": "1000000000",
+      "timeFrom": null,
+      "timeShift": "6h",
+      "title": "Active Users",
+      "type": "singlestat",
+      "valueFontSize": "200%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "aliasColors": {},
+      "breakPoint": "100%",
+      "cacheTimeout": null,
+      "combine": {
+        "label": "Others",
+        "threshold": 0
+      },
+      "datasource": "PostgreSQL",
+      "fontSize": "80%",
+      "format": "short",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 9
+      },
+      "hideTimeOverride": true,
+      "id": 12,
+      "interval": null,
+      "legend": {
+        "show": true,
+        "values": true
+      },
+      "legendType": "Right side",
+      "links": [],
+      "maxDataPoints": 3,
+      "nullPointMode": "connected",
+      "options": {},
+      "pieType": "pie",
+      "pluginVersion": "6.3.6",
+      "strokeWidth": "1",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select count(*) as value,c.\"DEVICE\" as metric, max(c.\"time\") as time from (\r\n\tselect  b.\"DEVICE\",b.\"VALUE\",d.\"time\" as time,d.\"PARTYID\" from useragent b left join \r\n(SELECT a.\"PARTYID\",MAX(a.\"TIMESTAMP\") as time from useragent a where   $__timeFilter( a.\"TIMESTAMP\") group by a.\"PARTYID\") d \r\non b.\"TIMESTAMP\"= d.\"time\" where b.\"PARTYID\" = d.\"PARTYID\" \r\n)  c  group by c.\"DEVICE\" ",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": "6h",
+      "title": "Device by user",
+      "type": "grafana-piechart-panel",
+      "valueName": "current"
+    },
+    {
+      "aliasColors": {},
+      "breakPoint": "25%",
+      "cacheTimeout": null,
+      "combine": {
+        "label": "Others",
+        "threshold": 0
+      },
+      "datasource": "PostgreSQL",
+      "fontSize": "80%",
+      "format": "short",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 9
+      },
+      "hideTimeOverride": true,
+      "id": 8,
+      "interval": null,
+      "legend": {
+        "show": true,
+        "values": true
+      },
+      "legendType": "Right side",
+      "links": [],
+      "maxDataPoints": 3,
+      "nullPointMode": "connected",
+      "options": {},
+      "pieType": "pie",
+      "pluginVersion": "6.3.6",
+      "strokeWidth": 1,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select count(*) as value,c.\"BROWSER\" as metric, max(c.\"time\") as time from (\r\n\tselect  b.\"BROWSER\",b.\"VALUE\",d.\"time\" as time,d.\"PARTYID\" from useragent b left join \r\n(SELECT a.\"PARTYID\",MAX(a.\"TIMESTAMP\") as time from useragent a where   $__timeFilter( a.\"TIMESTAMP\") group by a.\"PARTYID\") d \r\non b.\"TIMESTAMP\"= d.\"time\" where b.\"PARTYID\" = d.\"PARTYID\" \r\n)  c  group by c.\"BROWSER\" ",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": "6h",
+      "title": "Browser by user",
+      "type": "grafana-piechart-panel",
+      "valueName": "current"
+    },
+    {
+      "aliasColors": {},
+      "breakPoint": "50%",
+      "cacheTimeout": null,
+      "combine": {
+        "label": "Others",
+        "threshold": 0
+      },
+      "datasource": "PostgreSQL",
+      "fontSize": "80%",
+      "format": "short",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 9
+      },
+      "hideTimeOverride": true,
+      "id": 10,
+      "interval": null,
+      "legend": {
+        "show": true,
+        "values": true
+      },
+      "legendType": "Right side",
+      "links": [],
+      "maxDataPoints": 3,
+      "nullPointMode": "connected",
+      "options": {},
+      "pieType": "pie",
+      "pluginVersion": "6.3.6",
+      "strokeWidth": 1,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select count(*) as value,c.\"OS\" as metric, max(c.\"time\") as time from (\r\n\tselect  b.\"OS\",b.\"VALUE\",d.\"time\" as time,d.\"PARTYID\" from useragent b left join \r\n(SELECT a.\"PARTYID\",MAX(a.\"TIMESTAMP\") as time from useragent a where   $__timeFilter(a.\"TIMESTAMP\")  group by a.\"PARTYID\") d \r\non b.\"TIMESTAMP\"= d.\"time\" where b.\"PARTYID\" = d.\"PARTYID\" \r\n)  c  group by c.\"OS\" ",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": "6h",
+      "title": "OS by user",
+      "type": "grafana-piechart-panel",
+      "valueName": "current"
+    },
+    {
+      "aliasColors": {},
+      "breakPoint": "25%",
+      "cacheTimeout": null,
+      "combine": {
+        "label": "Others",
+        "threshold": 0
+      },
+      "datasource": "PostgreSQL",
+      "fontSize": "80%",
+      "format": "short",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 17
+      },
+      "hideTimeOverride": true,
+      "id": 15,
+      "interval": null,
+      "legend": {
+        "percentage": false,
+        "show": true,
+        "sideWidth": null,
+        "values": true
+      },
+      "legendType": "Right side",
+      "links": [],
+      "maxDataPoints": 3,
+      "nullPointMode": "connected",
+      "options": {},
+      "pieType": "pie",
+      "pluginVersion": "6.3.6",
+      "strokeWidth": 1,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select count(*) as value,c.\"USERAGENTNAME\" as metric, max(c.\"time\") as time from (\r\n\tselect  b.\"USERAGENTNAME\",b.\"VALUE\",d.\"time\" as time,d.\"PARTYID\" from browserversion b left join \r\n(SELECT a.\"PARTYID\",MAX(a.\"TIMESTAMP\") as time from browserversion a where   $__timeFilter( a.\"TIMESTAMP\") group by a.\"PARTYID\") d \r\non b.\"TIMESTAMP\"= d.\"time\" where b.\"PARTYID\" = d.\"PARTYID\")  c  group by c.\"USERAGENTNAME\"",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": "6h",
+      "title": "Browser version",
+      "type": "grafana-piechart-panel",
+      "valueName": "current"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 19,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "gms_psql",
+  "uid": "7qlK9V2Zkk",
+  "version": 18
+}
